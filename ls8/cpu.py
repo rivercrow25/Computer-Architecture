@@ -1,6 +1,7 @@
 """CPU functionality."""
 
 import sys
+from switch import Switcher
 
 
 class CPU:
@@ -12,6 +13,9 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0
         self.sp = 7
+        self.running = False
+        self.op_size = 0
+        self.switch = Switcher(self)
 
     def load(self, filename):
         """Load a program into memory."""
@@ -26,12 +30,12 @@ class CPU:
                         continue
 
                     val = int(n, 2)
-                    # store val in memory
+                # store val in memory
                     self.ram[address] = val
 
                     address += 1
 
-                    # print(f"{x:08b}: {x:d}")
+                # print(f"{x:08b}: {x:d}")
 
         except:
             print(f"{sys.argv[0]}: {filename} not found")
@@ -77,44 +81,48 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        running = True
+        self.running = True
 
-        while running:
+        while self.running:
             cmd = self.ram[self.pc]
-            # halt
-            if cmd == 0b00000001:
-                running = False
-            # ldi
-            if cmd == 0b10000010:
-                indx = self.ram[self.pc+1]
-                value = self.ram[self.pc+2]
-                self.reg[indx] = value
-                self.pc += (cmd >> 6) + 1
-            # prn
-            if cmd == 0b01000111:
-                indx = self.ram[self.pc+1]
-                print(self.reg[indx])
-                self.pc += (cmd >> 6) + 1
-            # alu mult
-            if cmd == 0b10100010:
-                self.alu(
-                    "MULTIPLY", self.ram[self.pc + 1], self.ram[self.pc + 2])
-                self.pc += (cmd >> 6) + 1
-            # push
-            if cmd == 0b01000101:
-                reg_index = self.ram[self.pc+1]
-                val = self.reg[reg_index]
 
-                self.reg[self.sp] -= 1
+            self.op_size = (cmd >> 6) + 1
+            self.switch.command(bin(cmd))
+            self.pc += self.op_size
+            # # halt
+            # if cmd == 0b00000001:
+            #     self.running = False
+            # # ldi
+            # if cmd == 0b10000010:
+            #     indx = self.ram[self.pc+1]
+            #     value = self.ram[self.pc+2]
+            #     self.reg[indx] = value
+            #     self.pc += (cmd >> 6) + 1
+            # # prn
+            # if cmd == 0b01000111:
+            #     indx = self.ram[self.pc+1]
+            #     print(self.reg[indx])
+            #     self.pc += (cmd >> 6) + 1
+            # # alu mult
+            # if cmd == 0b10100010:
+            #     self.alu(
+            #         "MULTIPLY", self.ram[self.pc + 1], self.ram[self.pc + 2])
+            #     self.pc += (cmd >> 6) + 1
+            # # push
+            # if cmd == 0b01000101:
+            #     reg_index = self.ram[self.pc+1]
+            #     val = self.reg[reg_index]
 
-                self.ram[self.reg[self.sp]] = val
+            #     self.reg[self.sp] -= 1
 
-                self.pc += (cmd >> 6) + 1
-            # pop
-            if cmd == 0b01000110:
-                reg_index = self.ram[self.pc + 1]
-                val = self.ram[self.reg[self.sp]]
+            #     self.ram[self.reg[self.sp]] = val
 
-                self.reg[reg_index] = val
-                self.reg[self.sp] += 1
-                self.pc += (cmd >> 6) + 1
+            #     self.pc += (cmd >> 6) + 1
+            # # pop
+            # if cmd == 0b01000110:
+            #     reg_index = self.ram[self.pc + 1]
+            #     val = self.ram[self.reg[self.sp]]
+
+            #     self.reg[reg_index] = val
+            #     self.reg[self.sp] += 1
+            #     self.pc += (cmd >> 6) + 1
