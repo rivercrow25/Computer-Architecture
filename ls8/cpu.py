@@ -11,6 +11,7 @@ class CPU:
         self.reg = [0] * 8
         self.ram = [0] * 256
         self.pc = 0
+        self.sp = 7
 
     def load(self, filename):
         """Load a program into memory."""
@@ -99,17 +100,21 @@ class CPU:
                 self.alu(
                     "MULTIPLY", self.ram[self.pc + 1], self.ram[self.pc + 2])
                 self.pc += (cmd >> 6) + 1
+            # push
+            if cmd == 0b01000101:
+                reg_index = self.ram[self.pc+1]
+                val = self.reg[reg_index]
 
+                self.reg[self.sp] -= 1
 
-# testing = [
-#     # From print8.ls8
-#     0b10000010,  # LDI R0,8
-#     0b00000000,
-#     0b00001000,
-#     0b01000111,  # PRN R0
-#     0b00000000,
-#     0b00000001,  # HLT
-# ]
+                self.ram[self.reg[self.sp]] = val
 
-# for item in testing:
-#     print(item)
+                self.pc += (cmd >> 6) + 1
+            # pop
+            if cmd == 0b01000110:
+                reg_index = self.ram[self.pc + 1]
+                val = self.ram[self.reg[self.sp]]
+
+                self.reg[reg_index] = val
+                self.reg[self.sp] += 1
+                self.pc += (cmd >> 6) + 1
