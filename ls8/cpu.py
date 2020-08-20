@@ -85,44 +85,6 @@ class CPU:
 
         while self.running:
             cmd = self.ram[self.pc]
-
             self.op_size = (cmd >> 6) + 1
             self.switch.command(bin(cmd))
             self.pc += self.op_size
-            # # halt
-            # if cmd == 0b00000001:
-            #     self.running = False
-            # # ldi
-            # if cmd == 0b10000010:
-            #     indx = self.ram[self.pc+1]
-            #     value = self.ram[self.pc+2]
-            #     self.reg[indx] = value
-            #     self.pc += (cmd >> 6) + 1
-            # # prn
-            # if cmd == 0b01000111:
-            #     indx = self.ram[self.pc+1]
-            #     print(self.reg[indx])
-            #     self.pc += (cmd >> 6) + 1
-            # # alu mult
-            # if cmd == 0b10100010:
-            #     self.alu(
-            #         "MULTIPLY", self.ram[self.pc + 1], self.ram[self.pc + 2])
-            #     self.pc += (cmd >> 6) + 1
-            # # push
-            # if cmd == 0b01000101:
-            #     reg_index = self.ram[self.pc+1]
-            #     val = self.reg[reg_index]
-
-            #     self.reg[self.sp] -= 1
-
-            #     self.ram[self.reg[self.sp]] = val
-
-            #     self.pc += (cmd >> 6) + 1
-            # # pop
-            # if cmd == 0b01000110:
-            #     reg_index = self.ram[self.pc + 1]
-            #     val = self.ram[self.reg[self.sp]]
-
-            #     self.reg[reg_index] = val
-            #     self.reg[self.sp] += 1
-            #     self.pc += (cmd >> 6) + 1

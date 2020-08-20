@@ -6,7 +6,7 @@ class Switcher():
         """Dispatch method"""
         method_name = 'cmd_' + str(argument)
         # Get the method from 'self'. Default to a lambda.
-        method = getattr(self, method_name, lambda: "Invalid month")
+        method = getattr(self, method_name, lambda: "Invalid command")
         # Call the method as we return it
         return method()
 
@@ -26,6 +26,10 @@ class Switcher():
         self.obj.alu(
             "MULTIPLY", self.obj.ram[self.obj.pc + 1], self.obj.ram[self.obj.pc + 2])
 
+    def cmd_0b10100000(self):
+        self.obj.alu(
+            "ADD", self.obj.ram[self.obj.pc + 1], self.obj.ram[self.obj.pc + 2])
+
     def cmd_0b1000101(self):
         reg_index = self.obj.ram[self.obj.pc+1]
         val = self.obj.reg[reg_index]
@@ -40,3 +44,16 @@ class Switcher():
 
         self.obj.reg[reg_index] = val
         self.obj.reg[self.obj.sp] += 1
+
+    def cmd_0b1010000(self):
+        self.obj.reg[self.obj.sp] -= 1
+        self.obj.ram[self.obj.reg[self.obj.sp]] = self.obj.pc + 2
+
+        reg_index = self.obj.ram[self.obj.pc + 1]
+        self.obj.pc = self.obj.reg[reg_index]
+        self.obj.op_size = 0
+
+    def cmd_0b10001(self):
+        self.obj.pc = self.obj.ram[self.obj.reg[self.obj.sp]]
+        self.obj.reg[self.obj.sp] += 1
+        self.obj.op_size = 0
