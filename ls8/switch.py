@@ -10,15 +10,15 @@ class Switcher():
         # Call the method as we return it
         return method()
 
-    def cmd_0b1(self):
+    def cmd_00000001(self):
         self.obj.running = False
 
-    def cmd_0b10000010(self):
+    def cmd_10000010(self):
         indx = self.obj.ram[self.obj.pc+1]
         value = self.obj.ram[self.obj.pc+2]
         self.obj.reg[indx] = value
 
-    def cmd_0b1000111(self):
+    def cmd_01000111(self):
         indx = self.obj.ram[self.obj.pc+1]
         print(self.obj.reg[indx])
 
@@ -57,3 +57,22 @@ class Switcher():
         self.obj.pc = self.obj.ram[self.obj.reg[self.obj.sp]]
         self.obj.reg[self.obj.sp] += 1
         self.obj.op_size = 0
+
+    def cmd_10100111(self):
+        self.obj.alu(
+            "CMP", self.obj.ram[self.obj.pc + 1], self.obj.ram[self.obj.pc + 2])
+        print(self.obj.reg[self.obj.ram[self.obj.pc + 1]],
+              self.obj.reg[self.obj.ram[self.obj.pc + 2]], self.obj.reg[3])
+
+    def cmd_01010100(self):
+        self.obj.pc = self.obj.ram[self.obj.pc + 1]
+
+    def cmd_01010101(self):
+        if self.obj.FL == 0b00000001:
+            self.obj.pc = self.obj.reg[self.obj.ram[self.obj.pc + 1]]
+            self.obj.op_size = 0
+
+    def cmd_01010110(self):
+        if self.obj.FL != 0b00000001:
+            self.obj.pc = self.obj.reg[self.obj.ram[self.obj.pc + 1]]
+            self.obj.op_size = 0

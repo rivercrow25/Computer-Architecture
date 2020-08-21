@@ -16,6 +16,7 @@ class CPU:
         self.running = False
         self.op_size = 0
         self.switch = Switcher(self)
+        self.FL = 0b00000000
 
     def load(self, filename):
         """Load a program into memory."""
@@ -49,6 +50,16 @@ class CPU:
         # elif op == "SUB": etc
         elif op == "MULTIPLY":
             self.reg[reg_a] = self.reg[reg_a] * self.reg[reg_b]
+        elif op == "CMP":
+            if self.reg[reg_a] > self.reg[reg_b]:
+                self.FL = self.FL & 0b00000010
+            if self.reg[reg_a] < self.reg[reg_b]:
+                self.FL = self.FL & 0b00000100
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.FL = self.FL & 0b00000001
+            if self.reg[reg_a] != self.reg[reg_b]:
+                self.FL = self.FL & 0b00000000
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -86,5 +97,5 @@ class CPU:
         while self.running:
             cmd = self.ram[self.pc]
             self.op_size = (cmd >> 6) + 1
-            self.switch.command(bin(cmd))
+            self.switch.command(format(cmd, '08b'))
             self.pc += self.op_size
