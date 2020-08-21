@@ -61,8 +61,6 @@ class Switcher():
     def cmd_10100111(self):
         self.obj.alu(
             "CMP", self.obj.ram[self.obj.pc + 1], self.obj.ram[self.obj.pc + 2])
-        print(self.obj.reg[self.obj.ram[self.obj.pc + 1]],
-              self.obj.reg[self.obj.ram[self.obj.pc + 2]], self.obj.reg[3])
 
     def cmd_01010100(self):
         self.obj.pc = self.obj.ram[self.obj.pc + 1]
